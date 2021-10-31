@@ -25,30 +25,30 @@ public class Producer {
 		//Create the Producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
-		//Create data
-		final ProducerRecord<String, String> record = new ProducerRecord<String, String>("topic_1", "id_1","hello world");
-		//Keys will go to same partition even when data is sent n times
 
-		//Send the data
-		producer.send(record, new Callback() {
-			public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-				if(e == null)
-				{
-					//Records are successfully sent
-					LOGGER.info("Data sent successfully");
-					LOGGER.info("Logging meta data " + recordMetadata.toString());
-				}
-				else
-				{
-					//throw exception
-					LOGGER.error("Exception thrown while sending data " + e.getStackTrace());
-				}
-			}
-		});
+		for(int i = 0; i < 10; i++) {
+			//Create data
+			final ProducerRecord<String, String> record = new ProducerRecord<String, String>("first_topic", "id_"+i, "hello world");
+			//Keys will go to same partition even when data is sent n times
 
-		//FLush and Close
-		producer.flush();
-		producer.close();
+			//Send the data
+			producer.send(record, new Callback() {
+				public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+					if (e == null) {
+						//Records are successfully sent
+						LOGGER.info("Data sent successfully");
+						LOGGER.info("Logging meta data " + recordMetadata.toString());
+					} else {
+						//throw exception
+						LOGGER.error("Exception thrown while sending data " + e.getStackTrace());
+					}
+				}
+			});
+
+			//FLush and Close
+			producer.flush();
+			producer.close();
+		}
 
 	}
 }
