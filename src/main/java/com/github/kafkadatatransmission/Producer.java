@@ -26,7 +26,8 @@ public class Producer {
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
 		//Create data
-		final ProducerRecord<String, String> record = new ProducerRecord<String, String>("topic_1", "hello world");
+		final ProducerRecord<String, String> record = new ProducerRecord<String, String>("topic_1", "id_1","hello world");
+		//Keys will go to same partition even when data is sent n times
 
 		//Send the data
 		producer.send(record, new Callback() {
