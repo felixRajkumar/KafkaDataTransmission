@@ -1,9 +1,9 @@
 package com.github.kafkadatatransmission;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -11,6 +11,7 @@ import java.util.Properties;
 public class Producer {
 
 	public static final String BOOTSTRAP_SERVER = "localhost:9092";
+	public static final Logger LOGGER = LoggerFactory.getLogger(Producer.class.getName());
 
 	public static void main(String[] args) {
 
@@ -25,10 +26,24 @@ public class Producer {
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
 		//Create data
-		ProducerRecord<String, String> record = new ProducerRecord<String, String>("topic_1", "hello world");
+		final ProducerRecord<String, String> record = new ProducerRecord<String, String>("topic_1", "hello world");
 
 		//Send the data
-		producer.send(record);
+		producer.send(record, new Callback() {
+			public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+				if(e == null)
+				{
+					//Records are successfully sent
+					LOGGER.info("Data sent successfully");
+					LOGGER.info("Logging meta data " + recordMetadata.toString());
+				}
+				else
+				{
+					//throw exception
+					LOGGER.error("Exception thrown while sending data " + e.getStackTrace());
+				}
+			}
+		});
 
 		//FLush and Close
 		producer.flush();
