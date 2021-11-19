@@ -28,27 +28,27 @@ public class Producer {
 
 		for(int i = 0; i < 10; i++) {
 			//Create data
-			final ProducerRecord<String, String> record = new ProducerRecord<String, String>("first_topic", "id_"+i, "hello world");
+			final ProducerRecord<String, String> record = new ProducerRecord<String, String>("first_topic", "id_"+i, "hello world " + i);
 			//Keys will go to same partition even when data is sent n times
 
 			//Send the data
-			producer.send(record, new Callback() {
-				public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-					if (e == null) {
-						//Records are successfully sent
-						LOGGER.info("Data sent successfully");
-						LOGGER.info("Logging meta data " + recordMetadata.toString());
-					} else {
-						//throw exception
-						LOGGER.error("Exception thrown while sending data " + e.getStackTrace());
-					}
+			producer.send(record, (recordMetadata, e) -> {
+				LOGGER.info("Logging now");
+				if (e == null) {
+					//Records are successfully sent
+					LOGGER.info("Data sent successfully");
+					LOGGER.info("Logging meta data " + recordMetadata.toString());
+					System.out.println(recordMetadata.toString());
+				} else {
+					//throw exception
+					LOGGER.error("Exception thrown while sending data " + e.getStackTrace());
 				}
 			});
-
-			//FLush and Close
-			producer.flush();
-			producer.close();
 		}
+
+		//FLush and Close
+		producer.flush();
+		producer.close();
 
 	}
 }
